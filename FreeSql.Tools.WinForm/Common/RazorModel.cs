@@ -3,12 +3,12 @@ using FreeSql.DataAnnotations;
 using FreeSql.DatabaseModel;
 using FreeSql.Internal.CommonProvider;
 using FreeSqlTools.Common;
+using FreeSqlTools.Component;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-
 public class RazorModel
 {
 	public RazorModel(TaskBuild task, List<DbTableInfo> tables, DbTableInfo table)

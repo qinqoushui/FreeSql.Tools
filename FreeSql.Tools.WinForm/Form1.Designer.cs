@@ -864,7 +864,7 @@
             // buttonItem28
             // 
             this.buttonItem28.Name = "buttonItem28";
-            this.buttonItem28.Text = "显示前100条";
+            this.buttonItem28.Text = "显示前1000条";
             this.buttonItem28.Click += new System.EventHandler(this.buttonItem28_Click);
             // 
             // node1
