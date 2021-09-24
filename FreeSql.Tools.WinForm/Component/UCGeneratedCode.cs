@@ -11,6 +11,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using System.Windows.Input;
 
 namespace FreeSqlTools.Component
 {
@@ -22,7 +23,7 @@ namespace FreeSqlTools.Component
         private readonly TextEditor editorCode = new TextEditor();
         public UCGeneratedCode(Node node)
         {
-            InitializeComponent();                   
+            InitializeComponent();
             InitTemplates();
             _node = node;
             var typeConverter = new HighlightingDefinitionTypeConverter();
@@ -38,8 +39,23 @@ namespace FreeSqlTools.Component
             var csSyntaxHighlighter = (IHighlightingDefinition)typeConverter.ConvertFrom("C#");
             editorTemplates.SyntaxHighlighting = csSyntaxHighlighter;
             editorCode.SyntaxHighlighting = csSyntaxHighlighter;
+            editorTemplates.KeyDown += (s, e) =>
+              {
+                  if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl) || e.KeyboardDevice.IsKeyDown(Key.RightCtrl))
+                  {
+                      switch (e.Key)
+                      {
+                          case Key.G:
+                              superTabControl1.SelectedTabIndex = -1;
+                              superTabControl1.SelectedTabIndex = 1;
+                              break;
+                          default:
+                              break;
+                      }
+                  }
+              };
             //将editor作为elemetnHost的组件
-            elementHost1.Child = editorTemplates;          
+            elementHost1.Child = editorTemplates;
             elementHost2.Child = editorCode;
             InitTableInfo();
         }
@@ -97,6 +113,7 @@ namespace FreeSqlTools.Component
 
             if (e.NewValue.Text == "生成代码")
             {
+                comboBoxEx1_DropDownClosed(null, null);//重读一次
                 var codeGenerate = new CodeGenerate();
                 var taskBuild = new TaskBuild()
                 {

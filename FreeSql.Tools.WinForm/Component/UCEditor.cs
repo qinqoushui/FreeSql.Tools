@@ -6,6 +6,7 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using System.Windows.Input;
 
 namespace FreeSqlTools.Component
 {
@@ -40,6 +41,20 @@ namespace FreeSqlTools.Component
             editor.SyntaxHighlighting = csSyntaxHighlighter;
             //将editor作为elemetnHost的组件
             elementHost1.Child = editor;
+            editor.KeyDown += (s, e) =>
+              {
+                  if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl) || e.KeyboardDevice.IsKeyDown(Key.RightCtrl))
+                  {
+                      switch (e.Key)
+                      {
+                          case Key.S:
+                              command_save.Execute();
+                              break;
+                          default:
+                              break;
+                      }
+                  }
+              };
             editor.Load(path);
             _path = path;
         }
@@ -50,7 +65,7 @@ namespace FreeSqlTools.Component
             ToastNotification.ToastBackColor = Color.Green;
             ToastNotification.ToastForeColor = Color.White;
             ToastNotification.ToastFont = new Font("微软雅黑", 22);
-            ToastNotification.Show(this,"编辑成功", null, 3000, eToastGlowColor.Green, eToastPosition.TopCenter);
+            ToastNotification.Show(this, "编辑成功", null, 3000, eToastGlowColor.Green, eToastPosition.TopCenter);
         }
 
 

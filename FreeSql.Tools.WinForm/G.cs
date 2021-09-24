@@ -17,7 +17,7 @@ namespace FreeSqlTools
             {"MySql","Data Source={2};Port={3};User ID={0};Password={1};Charset=utf8;SslMode=none;Max pool size=2" },
             {"Sqlite","Data Source={2};Pooling=true;Max Pool Size=10" },
             {"PostgreSQL","Host={2};Port={3};Username={0};Password={1};Database={4};Pooling=true;Maximum Pool Size=2" },
-            {"SqlServer", "Uid={0};Pwd={1};Initial Catalog={4};Data Source={2}{3};Pooling=true;Max Pool Size=3"},
+            {"SqlServer", "Uid={0};Pwd={1};Initial Catalog={4};Data Source={2}{3};Pooling=true;Max Pool Size=3;Connection Timeout=10;"},
             {"SqlServer1", "Data Source={2}; Integrated Security =True; Initial Catalog={4}; Pooling=true;Max Pool Size=3" }
         };
 
@@ -28,7 +28,7 @@ namespace FreeSqlTools
             var connString = keyValues[valid == 0 ? dataType.ToString() : dataType.ToString() + "1"];
             if (host.Length == 1 && host == ".") host = "127.0.0.1";
             connString = string.Format(connString, uid, pwd, host, dataType == FreeSql.DataType.SqlServer ?
-                port =="1433"?"":$",{port}": port, dataName);
+                port =="1433"?",1433":$",{port}": port, dataName);
             return connString;
         }
         public static void AddFreeSql(object key, DataBaseInfo dataBase)

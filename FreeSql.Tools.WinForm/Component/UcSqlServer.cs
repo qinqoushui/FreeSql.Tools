@@ -33,7 +33,7 @@ namespace FreeSqlTools.Component
         {
             if (!Validator(this.highlighter1)) return;
             var connString = G.GetConnectionString(FreeSql.DataType.SqlServer, textBoxX4.Text,
-            textBoxX5.Text, textBoxX2.Text, textBoxX6.Text, textBoxX3.Text, validator);
+            textBoxX5.Text, textBoxX2.Text, textBoxX6.Text, textBoxX3.Text, validator).TrimEnd(';')+ ";Connection Timeout=10;";
             try
             {
                 using (var fsql = new FreeSql.FreeSqlBuilder()
