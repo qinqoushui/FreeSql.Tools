@@ -54,6 +54,21 @@ namespace FreeSqlTools.Component
                       }
                   }
               };
+            editorCode.KeyDown += (s, e) =>
+              {
+                  if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl) || e.KeyboardDevice.IsKeyDown(Key.RightCtrl))
+                  {
+                      switch (e.Key)
+                      {
+                          case Key.G:
+                              superTabControl1.SelectedTabIndex = 0;
+                              superTabControl1.SelectedTabIndex = 1;
+                              break;
+                          default:
+                              break;
+                      }
+                  }
+              };
             //将editor作为elemetnHost的组件
             elementHost1.Child = editorTemplates;
             elementHost2.Child = editorCode;

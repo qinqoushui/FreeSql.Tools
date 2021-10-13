@@ -33,6 +33,20 @@ namespace FreeSqlTools.Component
             //字体
             editor.FontFamily = new System.Windows.Media.FontFamily("Consolas");
             editor.FontSize = 22;
+            editor.KeyDown += (s, e) =>
+              {
+                  //if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl) || e.KeyboardDevice.IsKeyDown(Key.RightCtrl))
+                  {
+                      switch (e.Key)
+                      {
+                          case System.Windows.Input.Key.F5:
+                              buttonItem1_Click(null, null);
+                              break;
+                          default:
+                              break;
+                      }
+                  }
+              };
             //C#语法高亮          
             var csSyntaxHighlighter = (IHighlightingDefinition)typeConverter.ConvertFrom("TSQL");
             editor.SyntaxHighlighting = csSyntaxHighlighter;
