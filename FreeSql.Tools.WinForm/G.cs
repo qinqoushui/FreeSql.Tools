@@ -28,7 +28,7 @@ namespace FreeSqlTools
             var connString = keyValues[valid == 0 ? dataType.ToString() : dataType.ToString() + "1"];
             if (host.Length == 1 && host == ".") host = "127.0.0.1";
             connString = string.Format(connString, uid, pwd, host, dataType == FreeSql.DataType.SqlServer ?
-                port =="1433"?",1433":$",{port}": port, dataName);
+                port == "1433" ? ",1433" : $",{port}" : port, dataName);
             return connString;
         }
         public static void AddFreeSql(object key, DataBaseInfo dataBase)
@@ -43,14 +43,14 @@ namespace FreeSqlTools
                     var _fsql = new FreeSql.FreeSqlBuilder()
                           .UseConnectionString(dataBase.DataType, connectionString)
                           .UseLazyLoading(true) //开启延时加载功能
-                          //.UseAutoSyncStructure(true) //自动同步实体结构到数据库              
+                                                //.UseAutoSyncStructure(true) //自动同步实体结构到数据库              
                           .UseMonitorCommand(
                               cmd => Trace.WriteLine(cmd.CommandText), //监听SQL命令对象，在执行前
                               (cmd, traceLog) => Console.WriteLine(traceLog))
                           .UseLazyLoading(true)
                           .Build();
                     _fsql.Aop.CurdAfter += (s, e) =>
-                    {                        
+                    {
                         if (e.ElapsedMilliseconds > 200)
                         {
                             //记录日志
@@ -147,5 +147,27 @@ namespace FreeSqlTools
             }
         }
 
+        public static string GetColumnDataTypeDefaultValue(this DbColumnInfo col)
+        {
+            var s = col.CsType.IsValueType ? Activator.CreateInstance(col.CsType) : null;
+            //if (s == null)
+            //    return "null";
+            //else
+            switch (col.CsType.Name)
+            {
+                case "String":
+                    return "''";
+                case "Boolean":
+                    return "0";
+                default:
+                    if (s == null)
+                        return col.CsType.FullName;
+                    else
+                        return s.ToString();
+                case "DateTime":
+                    return $"'{((DateTime)s).ToString("yyyy-MM-dd HH:mm:ss")}'";
+            }
+
+        }
     }
 }

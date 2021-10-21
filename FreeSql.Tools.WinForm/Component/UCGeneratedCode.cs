@@ -49,10 +49,28 @@ namespace FreeSqlTools.Component
                               superTabControl1.SelectedTabIndex = -1;
                               superTabControl1.SelectedTabIndex = 1;
                               break;
+                              case Key.S:
+                              //保存模板
+                               var fileInfo = lst.Where(a => a.Name == comboBoxEx1.Text).FirstOrDefault();
+            if (fileInfo != null)
+            {
+               System.IO.File.WriteAllText(fileInfo.FullName,editorTemplates.Text, System.Text.Encoding.UTF8); 
+            }
+                                  break ;
                           default:
                               break;
                       }
                   }
+                  else
+                       switch (e.Key)
+                      {
+                          case System.Windows.Input.Key.F5:
+                              superTabControl1.SelectedTabIndex = -1;
+                              superTabControl1.SelectedTabIndex = 1;
+                              break;
+                          default:
+                              break;
+                      }
               };
             editorCode.KeyDown += (s, e) =>
               {

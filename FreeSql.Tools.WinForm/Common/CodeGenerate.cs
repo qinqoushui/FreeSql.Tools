@@ -107,9 +107,9 @@ namespace FreeSqlTools.Common
                 plus.AppendLine();
                 return await Task.FromResult(plus.ToString());
             }
-            catch
+            catch(Exception ex)
             {
-                return await Task.FromResult(plus.ToString());
+                return await Task.FromResult(plus.ToString()+"\r\n"+ex.ToString());
             }
         }
     }
