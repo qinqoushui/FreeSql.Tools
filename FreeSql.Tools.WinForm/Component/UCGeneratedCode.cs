@@ -13,6 +13,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
 
+
 namespace FreeSqlTools.Component
 {
     public partial class UCGeneratedCode : UserControl
@@ -54,9 +55,27 @@ namespace FreeSqlTools.Component
                                var fileInfo = lst.Where(a => a.Name == comboBoxEx1.Text).FirstOrDefault();
             if (fileInfo != null)
             {
+                                  //历史版本
+                                  string nFile= Path.Combine( Path.GetDirectoryName(fileInfo.FullName),
+                                       Path.GetFileNameWithoutExtension(fileInfo.FullName),
+                                      Path.GetFileName(fileInfo.FullName)+$".{DateTime.Now.Second/4}");
+                                  if(! Directory.Exists( Path.GetDirectoryName(nFile))){
+                                        Directory.CreateDirectory(Path.GetDirectoryName(nFile));
+                                      }
+                                  System.IO.File.Copy(fileInfo.FullName,nFile,true);
                System.IO.File.WriteAllText(fileInfo.FullName,editorTemplates.Text, System.Text.Encoding.UTF8); 
             }
                                   break ;
+                              case Key.D:
+                                  break;
+                              case Key.O:
+                              //打开模板所在位置
+                             var fileInfo2 = lst.Where(a => a.Name == comboBoxEx1.Text).FirstOrDefault();
+            if (fileInfo2 != null)
+                              {
+                                  System.Diagnostics.Process.Start(System.IO.Path.GetDirectoryName(fileInfo2.FullName),"");
+                                  }
+                                  break;
                           default:
                               break;
                       }
