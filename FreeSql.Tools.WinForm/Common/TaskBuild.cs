@@ -15,6 +15,8 @@ namespace FreeSqlTools.Common
         public string GeneratePath { get; set; }
         public string FileName { get; set; }
         public string DbName { get; set; }
+
+        [JsonIgnore]
         public IFreeSql Fsql { get; set; }
         public string RemoveStr { get; set; }
         public string NamespaceName { get; set; }

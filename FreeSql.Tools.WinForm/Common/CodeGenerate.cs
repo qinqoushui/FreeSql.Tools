@@ -85,6 +85,7 @@ namespace FreeSqlTools.Common
             try
             {
                 var config = new TemplateServiceConfiguration();
+                //config.Namespaces.Add("System.ValueType");
                 config.EncodedStringFactory = new RawStringFactory();
                 Engine.Razor = RazorEngineService.Create(config);
                 var razorId = Guid.NewGuid().ToString("N");

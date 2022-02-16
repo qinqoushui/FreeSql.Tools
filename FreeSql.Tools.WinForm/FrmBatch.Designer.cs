@@ -298,7 +298,6 @@
             // 
             this.listBoxAdv2.BackgroundStyle.Class = "ListBoxAdv";
             this.listBoxAdv2.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.listBoxAdv2.CheckStateMember = null;
             this.listBoxAdv2.ContainerControlProcessDialogKey = true;
             this.listBoxAdv2.DragDropSupport = true;
             this.listBoxAdv2.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F";
@@ -316,7 +315,6 @@
             // 
             this.listBoxAdv1.BackgroundStyle.Class = "ListBoxAdv";
             this.listBoxAdv1.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
-            this.listBoxAdv1.CheckStateMember = null;
             this.listBoxAdv1.ContainerControlProcessDialogKey = true;
             this.listBoxAdv1.DragDropSupport = true;
             this.listBoxAdv1.LicenseKey = "F962CEC7-CD8F-4911-A9E9-CAB39962FC1F";
@@ -496,7 +494,6 @@
             this.listBoxAdv3.BackgroundStyle.Class = "RichTextBoxBorder";
             this.listBoxAdv3.BackgroundStyle.CornerType = DevComponents.DotNetBar.eCornerType.Square;
             this.listBoxAdv3.CheckBoxesVisible = true;
-            this.listBoxAdv3.CheckStateMember = null;
             this.listBoxAdv3.ContainerControlProcessDialogKey = true;
             this.listBoxAdv3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listBoxAdv3.DragDropSupport = true;
@@ -676,6 +673,7 @@
             this.Controls.Add(this.groupPanel2);
             this.Controls.Add(this.groupPanel1);
             this.DoubleBuffered = true;
+            this.KeyPreview = true;
             this.MaximizeBox = false;
             this.Name = "FrmBatch";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

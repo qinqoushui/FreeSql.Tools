@@ -2,6 +2,7 @@
 using DevComponents.DotNetBar;
 using FreeSql.DatabaseModel;
 using FreeSqlTools.Common;
+using RazorEngine.Templating;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,6 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace FreeSqlTools
 {
@@ -24,12 +26,37 @@ namespace FreeSqlTools
         {
             this.EnableGlass = false;
             InitializeComponent();
-            _node = node;                  
-            Load += FrmBatch_Load;   
+            _node = node;
+            Load += FrmBatch_Load;
+            this.KeyUp += FrmBatch_KeyUp;
         }
+
+        private void FrmBatch_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Control)
+            {
+                switch (e.KeyCode)
+                {
+                    case Keys.O:
+                        try
+                        {
+                            loadExportHistories();
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
         private void FrmBatch_Load(object sender, EventArgs e)
         {
-            ThreadPool.QueueUserWorkItem(x => {
+            ThreadPool.QueueUserWorkItem(x =>
+            {
                 frmLoading = new FrmLoading();
                 frmLoading.ShowDialog();
             });
@@ -39,6 +66,7 @@ namespace FreeSqlTools
             loadTemplates();
             Properties.Settings.Default.Reload();
             this.Invoke((Action)delegate { frmLoading.Close(); });
+
         }
 
         List<FileInfo> lst = new List<FileInfo>();
@@ -63,6 +91,8 @@ namespace FreeSqlTools
             dbTableInfos = G.GetTablesByDatabase(_node.Parent.DataKey, _node.Text);
             listBoxAdv1.DataSource = dbTableInfos.Select(a => a.Name).ToArray();
         }
+
+
 
         private void command_all_Executed(object sender, EventArgs e)
         {
@@ -121,7 +151,7 @@ namespace FreeSqlTools
                 MessageBoxEx.Show("请选择生成模板");
                 return;
             }
-            var templates = listBoxAdv3.CheckedItems.Cast<ListBoxItem>().Select(a => a.Text).ToArray();     
+            var templates = listBoxAdv3.CheckedItems.Cast<ListBoxItem>().Select(a => a.Text).ToArray();
             var taskBuild = new TaskBuild()
             {
                 Fsql = G.GetFreeSql(_node.DataKey),
@@ -136,9 +166,10 @@ namespace FreeSqlTools
                 OptionsEntity04 = checkBoxX4.Checked,
                 Templates = templates
             };
+            saveExportHistories(taskBuild);
             var tables = listBoxAdv2.Items.Cast<string>().ToArray();
             var tableInfos = dbTableInfos.Where(a => tables.Contains(a.Name)).ToList();
-            FrmLoading frmLoading=null;
+            FrmLoading frmLoading = null;
             ThreadPool.QueueUserWorkItem(new WaitCallback(a =>
             {
                 this.Invoke((Action)delegate ()
@@ -158,5 +189,44 @@ namespace FreeSqlTools
                 textBoxX4.Text = folderBrowserDialog1.SelectedPath;
             }
         }
+
+        #region 导出历史
+        void loadExportHistories()
+        {
+            using OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "导出历史|*.his";
+            openFileDialog.FilterIndex = 0;
+            openFileDialog.InitialDirectory = Application.StartupPath;
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string s = File.ReadAllText(openFileDialog.FileName, Encoding.UTF8);
+                var b = Newtonsoft.Json.JsonConvert.DeserializeObject<TaskBuild>(s);
+                _node.Text = b.DbName;
+                textBoxX3.Text = b.FileName;
+                textBoxX4.Text = b.GeneratePath;
+                textBoxX1.Text = b.NamespaceName;
+                textBoxX2.Text = b.RemoveStr;
+                checkBoxX1.Checked = b.OptionsEntity01;
+                checkBoxX2.Checked = b.OptionsEntity02;
+                checkBoxX3.Checked = b.OptionsEntity03;
+                checkBoxX4.Checked = b.OptionsEntity04;
+                for (int i = 0; i < listBoxAdv3.Items.Count; i++)
+                {
+                    listBoxAdv3.SetItemCheckState(i, b.Templates.Any(r => r == listBoxAdv3.Items[i].ToString())? CheckState.Checked: CheckState.Unchecked);
+
+                }
+            }
+        }
+
+        void saveExportHistories(TaskBuild data)
+        {
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(data, Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonSerializerSettings() { ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore });
+            string fileName = Path.Combine(Application.StartupPath, "ExportHistories", data.DbName, data.Templates.First() + ".his");
+            if (!Directory.Exists(Path.GetDirectoryName(fileName)))
+                Directory.CreateDirectory(Path.GetDirectoryName(fileName));
+            File.WriteAllText(fileName, json, Encoding.UTF8);
+        }
+
+        #endregion
     }
 }

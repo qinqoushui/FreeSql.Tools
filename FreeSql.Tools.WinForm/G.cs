@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace FreeSqlTools
 {
@@ -168,6 +169,40 @@ namespace FreeSqlTools
                     return $"'{((DateTime)s).ToString("yyyy-MM-dd HH:mm:ss")}'";
             }
 
+        }
+
+        public static string Serialize(this object obj, bool none = false)
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(obj, !none ? Newtonsoft.Json.Formatting.Indented : Newtonsoft.Json.Formatting.None);
+        }
+        public static T Deserialize<T>(this string json)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
+        }
+
+        public static T DeserializeAnonymousType<T>(this string json, T type)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeAnonymousType(json, type);
+        }
+
+        public static List<string> Deserialize(this string json, out List<string> names)
+        {
+            var token = Newtonsoft.Json.JsonConvert.DeserializeObject(json) as JToken;
+            var first = token.First;
+            var types = new List<string>();
+            var y = new List<(string n, string t)>();
+            names = new List<string>();
+            while (first != null)
+            {
+                y.Add(((first as JProperty).Name, ((first as JProperty).Value as JValue).Type.ToString()));
+                first = first.Next;
+            }
+            //排序处理
+            foreach (var m in y.OrderBy(r => r.t)) {
+                names.Add(m.n);
+                types.Add(m.t);
+            }
+            return types;
         }
     }
 }
