@@ -26,6 +26,10 @@ namespace FreeSqlTools
         {
             this.EnableGlass = false;
             InitializeComponent();
+            listBoxAdv2.SelectionMode = eSelectionMode.MultiExtended;
+            listBoxAdv1.SelectionMode = eSelectionMode.MultiExtended;
+
+
             _node = node;
             Load += FrmBatch_Load;
             this.KeyUp += FrmBatch_KeyUp;
@@ -108,22 +112,25 @@ namespace FreeSqlTools
 
         private void command_select_Executed(object sender, EventArgs e)
         {
-            var item = listBoxAdv1.SelectedItem;
-            if (item != null)
+            var items = listBoxAdv1.SelectedItems.Select(r=>r.Text).ToList();
+            if (items != null)
             {
-                if (!listBoxAdv2.Items.Cast<string>().Any(a => a == item.ToString()))
+                items.ToList().ForEach(item =>
                 {
-                    listBoxAdv2.Items.Add(item);
-                }
+                    if (!listBoxAdv2.Items.Cast<string>().Any(a => a == item.ToString()))
+                    {
+                        listBoxAdv2.Items.Add(item);
+                    }
+                });
             }
         }
 
         private void command_unselect_Executed(object sender, EventArgs e)
         {
-            var item = listBoxAdv2.SelectedItem;
-            if (item != null)
+            var items = listBoxAdv2.SelectedItems.Select(r => r.Text).ToList();
+            if (items != null)
             {
-                listBoxAdv2.Items.Remove(item);
+                items.ToList().ForEach(item => listBoxAdv2.Items.Remove(item));
             }
         }
 
@@ -166,9 +173,10 @@ namespace FreeSqlTools
                 OptionsEntity04 = checkBoxX4.Checked,
                 Templates = templates
             };
-            saveExportHistories(taskBuild);
             var tables = listBoxAdv2.Items.Cast<string>().ToArray();
             var tableInfos = dbTableInfos.Where(a => tables.Contains(a.Name)).ToList();
+            taskBuild.Tables = tableInfos.Select(r => r.Name).ToArray();
+            saveExportHistories(taskBuild);
             FrmLoading frmLoading = null;
             ThreadPool.QueueUserWorkItem(new WaitCallback(a =>
             {
@@ -212,9 +220,14 @@ namespace FreeSqlTools
                 checkBoxX4.Checked = b.OptionsEntity04;
                 for (int i = 0; i < listBoxAdv3.Items.Count; i++)
                 {
-                    listBoxAdv3.SetItemCheckState(i, b.Templates.Any(r => r == listBoxAdv3.Items[i].ToString())? CheckState.Checked: CheckState.Unchecked);
+                    listBoxAdv3.SetItemCheckState(i, b.Templates.Any(r => r == listBoxAdv3.Items[i].ToString()) ? CheckState.Checked : CheckState.Unchecked);
 
                 }
+                listBoxAdv2.BeginUpdate();
+                listBoxAdv2.Items.Clear();
+                if (b.Tables != null)
+                    b.Tables.ToList().ForEach(r => listBoxAdv2.Items.Add(r));
+                listBoxAdv2.EndUpdate();
             }
         }
 

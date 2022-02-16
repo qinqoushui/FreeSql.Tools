@@ -37,6 +37,6 @@ namespace FreeSqlTools.Common
         /// </summary>
         public bool OptionsEntity04 { get; set; } = false;
         public ICollection<string> Templates { get; set; }      
-
+        public ICollection<string> Tables { get; set;} 
     }
 }
