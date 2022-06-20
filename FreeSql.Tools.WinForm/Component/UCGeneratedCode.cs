@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Input;
 
@@ -51,38 +52,39 @@ namespace FreeSqlTools.Component
                               superTabControl1.SelectedTabIndex = -1;
                               superTabControl1.SelectedTabIndex = 1;
                               break;
-                              case Key.S:
+                          case Key.S:
                               //保存模板
-                               var fileInfo = lst.Where(a => a.Name == comboBoxEx1.Text).FirstOrDefault();
-            if (fileInfo != null)
-            {
-                                  //历史版本
-                                  string nFile= Path.Combine( Path.GetDirectoryName(fileInfo.FullName),
-                                       Path.GetFileNameWithoutExtension(fileInfo.FullName),
-                                      Path.GetFileName(fileInfo.FullName)+$".{DateTime.Now.Second/4}");
-                                  if(! Directory.Exists( Path.GetDirectoryName(nFile))){
-                                        Directory.CreateDirectory(Path.GetDirectoryName(nFile));
-                                      }
-                                  System.IO.File.Copy(fileInfo.FullName,nFile,true);
-               System.IO.File.WriteAllText(fileInfo.FullName,editorTemplates.Text, System.Text.Encoding.UTF8); 
-            }
-                                  break ;
-                              case Key.D:
-                                  break;
-                              case Key.O:
-                              //打开模板所在位置
-                             var fileInfo2 = lst.Where(a => a.Name == comboBoxEx1.Text).FirstOrDefault();
-            if (fileInfo2 != null)
+                              var fileInfo = lst.Where(a => a.Name == comboBoxEx1.Text).FirstOrDefault();
+                              if (fileInfo != null)
                               {
-                                  System.Diagnostics.Process.Start(System.IO.Path.GetDirectoryName(fileInfo2.FullName),"");
+                                  //历史版本
+                                  string nFile = Path.Combine(Path.GetDirectoryName(fileInfo.FullName),
+                                       Path.GetFileNameWithoutExtension(fileInfo.FullName),
+                                      Path.GetFileName(fileInfo.FullName) + $".{DateTime.Now.Second / 4}");
+                                  if (!Directory.Exists(Path.GetDirectoryName(nFile)))
+                                  {
+                                      Directory.CreateDirectory(Path.GetDirectoryName(nFile));
                                   }
-                                  break;
+                                  System.IO.File.Copy(fileInfo.FullName, nFile, true);
+                                  System.IO.File.WriteAllText(fileInfo.FullName, editorTemplates.Text, System.Text.Encoding.UTF8);
+                              }
+                              break;
+                          case Key.D:
+                              break;
+                          case Key.O:
+                              //打开模板所在位置
+                              var fileInfo2 = lst.Where(a => a.Name == comboBoxEx1.Text).FirstOrDefault();
+                              if (fileInfo2 != null)
+                              {
+                                  System.Diagnostics.Process.Start(System.IO.Path.GetDirectoryName(fileInfo2.FullName), "");
+                              }
+                              break;
                           default:
                               break;
                       }
                   }
                   else
-                       switch (e.Key)
+                      switch (e.Key)
                       {
                           case System.Windows.Input.Key.F5:
                               superTabControl1.SelectedTabIndex = -1;
@@ -183,8 +185,14 @@ namespace FreeSqlTools.Component
                     OptionsEntity03 = checkBoxX3.Checked,
                     OptionsEntity04 = checkBoxX4.Checked
                 };
-
+                FrmLoading frmLoading = null;
+                ThreadPool.QueueUserWorkItem(new WaitCallback(a =>
+                {
+                    frmLoading = new FrmLoading();
+                    frmLoading.ShowDialog();
+                }));
                 editorCode.Text = await codeGenerate.Setup(taskBuild, editorTemplates.Text, dbTableInfos, dbTableInfo);
+                this.Invoke((Action)delegate () { Thread.CurrentThread.Join(500); frmLoading.Close(); });
             }
         }
     }
