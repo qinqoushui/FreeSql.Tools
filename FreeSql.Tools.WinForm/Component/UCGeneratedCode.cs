@@ -5,6 +5,7 @@ using FreeSqlTools.Common;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.TextEditor.Document;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -135,6 +136,7 @@ namespace FreeSqlTools.Component
         }
         List<DbTableInfo> dbTableInfos = new List<DbTableInfo>();
         DbTableInfo dbTableInfo = null;
+        MySqlBackup MySqlBackup = null;
         void InitTableInfo()
         {
             dbTableInfos = _node.Parent.Nodes.Cast<Node>()
@@ -142,6 +144,9 @@ namespace FreeSqlTools.Component
             //G.GetTablesByDatabase(_node.Parent.DataKey, _node.Parent.Text);
             dbTableInfo = dbTableInfos.FirstOrDefault(a => a.Name == _node.Text);
             dataGridViewX1.DataSource = dbTableInfo?.Columns;
+            //var dataBaseInfo = (DataBaseInfo)(_node.Level == 3 ? _node.Parent.Parent.Tag :
+            //     _node.Parent.Tag);
+            //MySqlBackup = new MySqlBackup(G.GetNewFreeSql(dataBaseInfo).Value.Ado.ConnectionString);
         }
 
         private void comboBoxEx1_DropDownClosed(object sender, EventArgs e)

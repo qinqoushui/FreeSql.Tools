@@ -102,6 +102,7 @@ namespace FreeSqlTools.Component
                 case FreeSql.DataType.PostgreSQL:
 
                     textBox1.Text = mySqlBackup.ExportRowsToString(_node.Parent.Text, _node.Text, sqlString);
+                    textBoxMD.Text = mySqlBackup.ExportRowsToMarkDownString(_node.Parent.Text, _node.Text, sqlString);
                     break;
             }
             stopwatch.Stop();

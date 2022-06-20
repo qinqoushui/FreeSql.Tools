@@ -137,6 +137,8 @@ namespace FreeSqlTools
                 if (DataBase.TryGetValue(key, out Lazy<IFreeSql> fsql))
                 {
                     var ls2 = fsql.Value.DbFirst.GetTablesByDatabase(dataName);
+                    if (fsql.Value.Ado.DataType == FreeSql.DataType.MySql)
+                        ls2.ForEach(r => r.Schema = dataName);
                     list = ls2.ToList();
                 }
                 return list;
@@ -198,7 +200,8 @@ namespace FreeSqlTools
                 first = first.Next;
             }
             //排序处理
-            foreach (var m in y.OrderBy(r => r.t)) {
+            foreach (var m in y.OrderBy(r => r.t))
+            {
                 names.Add(m.n);
                 types.Add(m.t);
             }
