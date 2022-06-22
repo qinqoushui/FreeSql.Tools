@@ -73,7 +73,7 @@ namespace FreeSqlTools
                     DataKey = $"{m.DataType.ToString()}_{m.Id.ToString("N")}"
                 };
                 node.ContextMenu = buttonItem21;
-                G.AddFreeSql(node.DataKey,m);
+                G.AddFreeSql(node.DataKey, m);
                 nodes.Add(node);
             }
             advTree1.Nodes[0].Nodes.AddRange(nodes.ToArray());
@@ -148,9 +148,21 @@ namespace FreeSqlTools
                      {
                          Image = Properties.Resources._base,
                          DataKey = node.DataKey,
-                         ContextMenu = buttonItem22
+                         ContextMenu = buttonItem22,
+                         Name = a
                      }).ToArray();
                      node.Nodes.AddRange(nodes);
+                     try
+                     {
+                         if (!string.IsNullOrEmpty(Properties.Settings.Default.LastTableName))
+                         {
+                             advTree1.SelectedNode = node.Nodes.Find(Properties.Settings.Default.LastTableName.Split('.')[0], false).FirstOrDefault();
+                         }
+                     }
+                     catch
+                     {
+
+                     }
                  }
                  else if (node.Level == 2)
                  {
@@ -160,14 +172,27 @@ namespace FreeSqlTools
                      var nodes = list.Select(a => new Node(a.Name)
                      {
                          Image = Properties.Resources.application,
-                        // CheckBoxVisible = true,
-                        // CheckBoxStyle = DevComponents.DotNetBar.eCheckBoxStyle.CheckBox,
-                        // CheckState = CheckState.Unchecked,
+                         // CheckBoxVisible = true,
+                         // CheckBoxStyle = DevComponents.DotNetBar.eCheckBoxStyle.CheckBox,
+                         // CheckState = CheckState.Unchecked,
                          Tag = a,
                          DataKey = node.DataKey,
-                         ContextMenu = buttonItem23
+                         ContextMenu = buttonItem23,
+                         Name=a.Name
                      }).ToArray();
                      node.Nodes.AddRange(nodes);
+                     //尝试定位到上次的选择
+                     try
+                     {
+                         if (!string.IsNullOrEmpty(Properties.Settings.Default.LastTableName))
+                         {
+                             advTree1.SelectedNode = node.Nodes.Find(Properties.Settings.Default.LastTableName.Split('.')[1], false).FirstOrDefault();
+                         }
+                     }
+                     catch
+                     {
+
+                     }
                  }
                  return 0;
              });
@@ -295,6 +320,8 @@ namespace FreeSqlTools
         private void buttonItem32_Click(object sender, EventArgs e)
         {
             var node = advTree1.SelectedNode;
+            Properties.Settings.Default.LastTableName = $"{node.Parent.Text }.{node.Text}";
+            Properties.Settings.Default.Save();
             var superItem = superTabControl1.CreateTab($"({node.Parent.Text })-{node.Text}");
             var ucEditor = new UCGeneratedCode(node);
             superTabControl1.SelectedTab = superItem;
@@ -306,6 +333,8 @@ namespace FreeSqlTools
         {
             var node = advTree1.SelectedNode;
             var superItem = superTabControl1.CreateTab($"({node.Parent.Text })-{node.Text} 查询");
+            Properties.Settings.Default.LastTableName = $"{node.Parent.Text }.{node.Text}";
+            Properties.Settings.Default.Save();
             var ucEditor = new UCDataGrid(node);
             superTabControl1.SelectedTab = superItem;
             ucEditor.Dock = DockStyle.Fill;

@@ -70,12 +70,12 @@ namespace FreeSqlTools.Component
             switch (dataBaseInfo.DataType)
             {
                 case FreeSql.DataType.SqlServer:
-                    sqlString = $"SELECT top 1000 * FROM {_node.Text}"; break;
+                    sqlString = $"use [{_node.Parent.Text}];SELECT top 1000 * FROM {_node.Text}"; break;
                 case FreeSql.DataType.Oracle:
-                    sqlString = $"SELECT * FROM {_node.Text} WHERE ROWNUM <=1000"; break;
+                    sqlString = $"use {_node.Parent.Text};SELECT * FROM {_node.Text} WHERE ROWNUM <=1000"; break;
                 case FreeSql.DataType.MySql:
                 case FreeSql.DataType.PostgreSQL:
-                    sqlString = $"SELECT * FROM `{_node.Parent.Text}`.`{_node.Text}` LIMIT 1000";
+                    sqlString = $"use `{_node.Parent.Text}`;SELECT * FROM `{_node.Text}` LIMIT 1000";
                     mySqlBackup = new MySqlBackup(fsql.Value.Ado.ConnectionString);
                     mySqlBackup.ExportInfo.RowsExportMode = RowsDataExportMode.Replace;
                     break;
@@ -100,9 +100,18 @@ namespace FreeSqlTools.Component
             {
                 case FreeSql.DataType.MySql:
                 case FreeSql.DataType.PostgreSQL:
-
-                    textBox1.Text = mySqlBackup.ExportRowsToString(_node.Parent.Text, _node.Text, sqlString);
-                    textBoxMD.Text = mySqlBackup.ExportRowsToMarkDownString(_node.Parent.Text, _node.Text, sqlString);
+                    try
+                    {
+                        textBox1.Text = mySqlBackup.ExportRowsToString(_node.Parent.Text, _node.Text, sqlString);
+                        textBoxMD.Text = mySqlBackup.ExportRowsToMarkDownString(_node.Parent.Text, _node.Text, sqlString);
+                    }
+                    catch (Exception ex)
+                    {
+                        //从DG中导出MD数据
+                        textBox1.Text = String.Empty;
+                        textBoxMD.Text = G.Table2MD(dataGridViewX1.DataSource as DataTable);
+                        MessageBox.Show(ex.Message);
+                    }
                     break;
             }
             stopwatch.Stop();
@@ -112,6 +121,10 @@ namespace FreeSqlTools.Component
 
         private void buttonItem1_Click(object sender, EventArgs e)
         {
+            if (!editor.Text.StartsWith("use"))
+            {
+                editor.Text = $"use {_node.Parent.Text};\r\n" + editor.Text;
+            }
             this.BeginInvoke(QueryBindDataGridView, editor.Text);
         }
 

@@ -11,5 +11,8 @@
     <Setting Name="saveFile" Type="System.String" Scope="User">
       <Value Profile="(Default)">{name}.cs</Value>
     </Setting>
+    <Setting Name="LastTableName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

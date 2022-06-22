@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace FreeSqlTools
 {
@@ -206,6 +207,26 @@ namespace FreeSqlTools
                 types.Add(m.t);
             }
             return types;
+        }
+
+        public static string Table2MD(System.Data.DataTable table)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            System.Data.DataColumn[] columns = new System.Data.DataColumn[table.Columns.Count];
+            table.Columns.CopyTo(columns, 0);
+            stringBuilder.Append("|");
+            stringBuilder.Append(string.Join("|", columns.ToList().Select(r => r.ColumnName).ToArray()));
+            stringBuilder.AppendLine("|");
+
+            stringBuilder.Append("|");
+            stringBuilder.Append(string.Join("|", columns.ToList().Select(r => "--").ToArray()));
+            stringBuilder.AppendLine("|");
+
+            foreach (System.Data.DataRow row in table.Rows)
+            {
+                stringBuilder.AppendLine("|"+string.Join("|", row.ItemArray)+"|");
+            }
+            return stringBuilder.ToString();
         }
     }
 }
