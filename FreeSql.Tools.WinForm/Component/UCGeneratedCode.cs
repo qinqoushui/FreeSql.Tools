@@ -192,7 +192,7 @@ namespace FreeSqlTools.Component
                     frmLoading.ShowDialog();
                 }));
                 editorCode.Text = await codeGenerate.Setup(taskBuild, editorTemplates.Text, dbTableInfos, dbTableInfo);
-                this.Invoke((Action)delegate () { Thread.CurrentThread.Join(500); frmLoading.Close(); });
+                this.Invoke((Action)delegate () { Thread.CurrentThread.Join(2000); frmLoading?.Close(); });
             }
         }
     }
