@@ -104,13 +104,15 @@ namespace FreeSqlTools.Component
                     {
                         textBox1.Text = mySqlBackup.ExportRowsToString(_node.Parent.Text, _node.Text, sqlString);
                         textBoxMD.Text = mySqlBackup.ExportRowsToMarkDownString(_node.Parent.Text, _node.Text, sqlString);
+                        textBoxStruct.Text = G.TableStruct2MD(_node.Tag as FreeSql.DatabaseModel.DbTableInfo);
                     }
                     catch (Exception ex)
                     {
                         //从DG中导出MD数据
                         textBox1.Text = String.Empty;
                         textBoxMD.Text = G.Table2MD(dataGridViewX1.DataSource as DataTable);
-                        MessageBox.Show(ex.Message);
+                        textBoxStruct.Text = String.Empty;
+                       MessageBox.Show(ex.Message);
                     }
                     break;
             }

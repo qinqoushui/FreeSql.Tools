@@ -1,4 +1,5 @@
-﻿using DevComponents.DotNetBar;
+﻿extern alias mysql69;
+using DevComponents.DotNetBar;
 using FreeSql.DatabaseModel;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using MySql.Data.MySqlClient;
+using System.Windows.Media;
 
 namespace FreeSqlTools
 {
@@ -224,9 +227,48 @@ namespace FreeSqlTools
 
             foreach (System.Data.DataRow row in table.Rows)
             {
-                stringBuilder.AppendLine("|"+string.Join("|", row.ItemArray)+"|");
+                stringBuilder.AppendLine("|" + string.Join("|", row.ItemArray) + "|");
             }
             return stringBuilder.ToString();
+        }
+
+        public static string TableStruct2MD(DbTableInfo dbTableInfo)
+        {
+            string ss = @"
+| 序号 | 列名 | 数据类型 | 长度 | 小数位数 | 主键 | 自增 | 允许空 | 默认值 | 列说明 | 
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | ";
+            StringBuilder sb = new StringBuilder($"### {dbTableInfo.Name} {dbTableInfo.Comment}");
+            sb.AppendLine(ss);
+            int startIndex = dbTableInfo.Columns.Min(r => r.Position);
+            dbTableInfo.Columns.OrderBy(r=>r.Position).ToList().ForEach(c =>
+            {
+                sb.AppendLine($"|{c.Position-startIndex+1}|{c.Name}|{c.DbTypeText}|{c.MaxLength}||{(c.IsPrimary?"Y":"")}|{(c.IsIdentity ? "Y" : "")}|{(c.IsNullable ? "Y" : "")}|{c.DefaultValue}|{c.Coment}");
+            });
+
+            return sb.ToString();
+            
+        }
+        public static int ExecuteScript(IFreeSql freesql, string SQLString)
+        {
+            string currentconn = freesql.Ado.ConnectionString;
+
+            SQLString = SQLString.Replace(Environment.NewLine, "");//去掉换行符
+            using (var connection = new mysql69.MySql.Data.MySqlClient.MySqlConnection(currentconn))
+            {
+                var script = new mysql69.MySql.Data.MySqlClient.MySqlScript(connection);
+                try
+                {
+                    connection.Open();
+                    script.Query = SQLString;
+                    int rows = script.Execute();
+                    return rows;
+                }
+                catch (MySqlException e)
+                {
+                    connection.Close();
+                    return 0;
+                }
+            }
         }
     }
 }
